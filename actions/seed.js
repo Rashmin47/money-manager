@@ -2,9 +2,8 @@
 
 import { db } from "@/lib/prisma";
 import { subDays } from "date-fns";
-
-const ACCOUNT_ID = "9652e4d6-a0ac-45ef-89c8-bf0ba69fe766-id";
-const USER_ID = "adf5ed59-fbce-4ae7-9535-f5d737e12054";
+const USER_ID = "9652e4d6-a0ac-45ef-89c8-bf0ba69fe766-id";
+const ACCOUNT_ID = "adf5ed59-fbce-4ae7-9535-f5d737e12054";
 
 // Categories with their typical amount ranges
 const CATEGORIES = {
@@ -43,6 +42,14 @@ function getRandomCategory(type) {
 
 export async function seedTransactions() {
   try {
+    // Get or create a demo user
+    let user = await db.user.findFirst();
+
+    // Get or create a demo account
+    let account = await db.account.findFirst({
+      where: { userId: user.id },
+    });
+
     // Generate 90 days of transactions
     const transactions = [];
     let totalBalance = 0;
@@ -87,9 +94,11 @@ export async function seedTransactions() {
       });
 
       // Insert new transactions
-      await tx.transaction.createMany({
-        data: transactions,
-      });
+      if (transactions.length > 0) {
+        await tx.transaction.createMany({
+          data: transactions,
+        });
+      }
 
       // Update account balance
       await tx.account.update({
@@ -100,7 +109,7 @@ export async function seedTransactions() {
 
     return {
       success: true,
-      message: `Created ${transactions.length} transactions`,
+      message: `Created ${transactions.length} transactions for user ${USER_ID} in account ${ACCOUNT_ID}`,
     };
   } catch (error) {
     console.error("Error seeding transactions:", error);
