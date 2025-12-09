@@ -29,7 +29,7 @@ import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { cn } from "@/lib/utils";
 import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
-// import { ReceiptScanner } from "./recipt-scanner";
+import { ReceiptScanner } from "./receipt-scanner";
 
 export function AddTransactionForm({
   accounts,
@@ -94,6 +94,20 @@ export function AddTransactionForm({
     }
   };
 
+  const handleScanComplete = (scannedData) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+      toast.success("Receipt scanned successfully");
+    }
+  };
+
   useEffect(() => {
     if (transactionResult?.success && !transactionLoading) {
       toast.success(
@@ -116,6 +130,8 @@ export function AddTransactionForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Receipt Scanner - Only show in create mode */}
+      {!editMode && <ReceiptScanner onScanComplete={handleScanComplete} />}
       {/* Type */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Type</label>
