@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useWatch } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -120,9 +121,9 @@ export function AddTransactionForm({
     }
   }, [transactionResult, transactionLoading, editMode]);
 
-  const type = watch("type");
-  const isRecurring = watch("isRecurring");
-  const date = watch("date");
+  const type = useWatch({ control, name: "type" });
+  const isRecurring = useWatch({ control, name: "isRecurring" });
+  const date = useWatch({ control, name: "date" });
 
   const filteredCategories = categories.filter(
     (category) => category.type === type
