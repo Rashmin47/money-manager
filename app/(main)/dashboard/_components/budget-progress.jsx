@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateBudget } from "@/actions/budget";
 
-export function BudgetProgress({ initialBudget, currentExpenses }) {
+export default function BudgetProgress({ initialBudget, currentExpenses }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newBudget, setNewBudget] = useState(
     initialBudget?.amount?.toString() || ""
@@ -51,11 +51,17 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
   };
 
   useEffect(() => {
-    if (updatedBudget?.success) {
+    if (!updatedBudget?.success) return;
+
+    // defer state update so it's not "synchronous" inside the effect
+    const id = setTimeout(() => {
       setIsEditing(false);
-      toast.success("Budget updated successfully");
-    }
-  }, [updatedBudget]);
+    }, 0);
+
+    toast.success("Budget updated successfully");
+
+    return () => clearTimeout(id);
+  }, [updatedBudget?.success]);
 
   useEffect(() => {
     if (error) {
