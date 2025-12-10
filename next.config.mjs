@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
+
+  serverExternalPackages: ["@prisma/client"],
+
+  webpack: (config) => {
+    config.externals.push({
+      "@prisma/client": "commonjs @prisma/client",
+      ".prisma/client": "commonjs .prisma/client",
+    });
+    return config;
+  },
   images: {
     remotePatterns: [
       {
@@ -13,7 +23,6 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "5mb",
     },
-    serverComponentsExternalPackages: ["@prisma/client", "prisma"],
   },
 };
 
