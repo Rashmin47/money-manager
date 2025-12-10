@@ -1,4 +1,3 @@
-import arcjet, { createMiddleware, detectBot, shield } from "@arcjet/next";
 import {
   auth,
   clerkMiddleware,
@@ -10,19 +9,8 @@ const isProtectedRoute = createRouteMatcher([
   "/account(.*)",
   "/transaction(.*)",
 ]);
-const aj = arcjet({
-  key: process.env.ARCJET_KEY,
-  rules: [
-    shield({
-      mode: "LIVE",
-    }),
-    detectBot({
-      mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE", "GO_HTTP"],
-    }),
-  ],
-});
-const clerk = clerkMiddleware(async (auth, req) => {
+
+export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
   if (!userId && isProtectedRoute(req)) {
@@ -30,7 +18,7 @@ const clerk = clerkMiddleware(async (auth, req) => {
     return redirectToSignIn();
   }
 });
-export default createMiddleware(aj, clerk);
+
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
